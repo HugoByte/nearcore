@@ -1,47 +1,33 @@
 use std::io::Error;
 use near_primitives::receipt::{Receipt, ActionReceipt};
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 use near_primitives::transaction::{Action, AddKeyAction, CreateAccountAction, DeleteAccountAction, DeleteKeyAction,
                          DeployContractAction, FunctionCallAction, SignedTransaction, StakeAction, Transaction,
                          TransferAction};
 use near_primitives::borsh::{BorshDeserialize, BorshSerialize};
 use near_crypto::PublicKey;
 
-#[derive(Serialize, Deserialize)]
-struct Person {
-    name: String,
-    age: u8,
-    phones: Vec<String>,
-}
+use std::fs::File;
+use std::io::BufReader;
+use std::marker::PhantomData;
+use std::path::Path;
 
 fn main() -> Result<(), Error> {
     println!("Start");
 
-    // Read receipts from the dump
-    // let data = r#"Receipt { predecessor_id: "wrap.near", receiver_id: "wrap.near", receipt_id: `3RgTMGUKLxZF6BJ6zhwTVgPM3MvykAoSiS9MPKWwEgeR`, receipt: Action(ActionReceipt { signer_id: "67bad843e9ecaab916f0f28ae100b8e0541f4ab3648a0958ac9b3a44eb5031cb", signer_public_key: ed25519:7yvEtACLafq9JCii5SPWh4dercz5BkjTKXck1oSGiWFL, gas_price: 347841850, output_data_receivers: [], input_data_ids: [`G1Dy9q4a7YfyvEQbLZc4b8RDWoYgfwcmU3bxePtRXVJz`], actions: [FunctionCall(FunctionCallAction { method_name: ft_resolve_transfer, args: (146)`{"sender_id":"67bad843e9ecaab916f0f28ae100b8e0541f4ab3648a0958ac9b3a44eb5031cb","receiver_id":"amm.counselor.near","amount":"100…`, gas: 5000000000000, deposit: 0 })] }) }"#.as_bytes();
-    let data = r#"Receipt { predecessor_id: "wrap.near", receiver_id: "wrap.near", receipt_id: `3RgTMGUKLxZF6BJ6zhwTVgPM3MvykAoSiS9MPKWwEgeR`, receipt: Action(ActionReceipt { signer_id: "67bad843e9ecaab916f0f28ae100b8e0541f4ab3648a0958ac9b3a44eb5031cb", signer_public_key: ed25519:7yvEtACLafq9JCii5SPWh4dercz5BkjTKXck1oSGiWFL, gas_price: 347841850, output_data_receivers: [], input_data_ids: [`G1Dy9q4a7YfyvEQbLZc4b8RDWoYgfwcmU3bxePtRXVJz`], actions: [] }) }"#.as_bytes();
-    let data2 = r#"ed25519:7yvEtACLafq9JCii5SPWh4dercz5BkjTKXck1oSGiWFL"#.as_bytes();
+    let rx_json = json!({"predecessor_id":"eve.alice.near","receiver_id":"3885505359911f2493f0c40a2bf042981936ec5dddd59708581b155a047864d8","receipt_id":"11111111111111111111111111111111","receipt":{"Action":{"signer_id":"eve.alice.near","signer_public_key":"ed25519:22skMptHjFWNyuEWY22ftn2AbLPSYpmYwGJRGwpNHbTV","gas_price":"1000000000","output_data_receivers":[],"input_data_ids":[],"actions":[{"Transfer":{"deposit":"499999999998639792875000000000000"}}]}}});
+    let r = serde_json::from_value::<Receipt>(rx_json)?;
+    let rxs = vec![r];
+    // println!("{:#?}", r);
+    let bytes = rxs.try_to_vec().unwrap();
+    let str_path = String::from("./utils/restored-receipts-verifier/receipts.dat");
+    let rxs_path = Path::new(&str_path);
+    std::fs::write(rxs_path, bytes);
 
-    // let data = r#"
-    //
-    // ";
-    println!("{}", data.len());
-    let r: Receipt = Receipt::try_from_slice(data)?; // serde_json::from_str::<Receipt>(data)?;
-    let p = PublicKey::try_from_slice(data2)?;
-    println!("{:#?}", p);
-
-    // let data2 = r#"
-    //     {
-    //         "name": "John Doe",
-    //         "age": 43,
-    //         "phones": [
-    //             "+44 1234567",
-    //             "+44 2345678"
-    //         ]
-    //     }"#;
-    // let p: Person = serde_json::from_str(data2)?;
-    // Do things just like with any other Rust data structure.
-    // println!("{:?}", p.phones);
+    let bytes = include_bytes!("../receipts.dat");
+    let rxs_read = <Vec<Receipt>>::try_from_slice(bytes).unwrap();
+    println!("{:#?}", rxs_read);
 
     Ok(())
 }
