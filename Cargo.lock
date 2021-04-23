@@ -4768,7 +4768,10 @@ dependencies = [
 name = "restored-receipts-verifier"
 version = "0.1.0"
 dependencies = [
- "syn 1.0.60",
+ "near-crypto",
+ "near-primitives",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
