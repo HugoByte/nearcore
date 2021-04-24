@@ -2930,6 +2930,9 @@ impl<'a> ChainUpdate<'a> {
                     self.chain_store_update.save_chunk_extra(&block.hash(), shard_id, new_extra);
 
                     if !apply_result.outcomes.is_empty() {
+                        for outcome_with_id in apply_result.outcomes.iter() {
+                            println!("{:#?}", outcome_with_id);
+                        }
                         // debug_assert!(false);
                         // Remove in next release
                         let (_, outcome_paths) =

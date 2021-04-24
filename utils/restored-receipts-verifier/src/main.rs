@@ -1,16 +1,11 @@
 use std::io::Error;
-use near_primitives::receipt::{Receipt, ActionReceipt};
+use near_primitives::receipt::Receipt;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use near_primitives::transaction::{Action, AddKeyAction, CreateAccountAction, DeleteAccountAction, DeleteKeyAction,
-                         DeployContractAction, FunctionCallAction, SignedTransaction, StakeAction, Transaction,
-                         TransferAction};
 use near_primitives::borsh::{BorshDeserialize, BorshSerialize};
 use near_crypto::PublicKey;
 
 use std::fs::File;
-use std::io::BufReader;
-use std::marker::PhantomData;
 use std::path::Path;
 
 fn main() -> Result<(), Error> {
