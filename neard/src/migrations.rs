@@ -169,6 +169,9 @@ pub fn migrate_17_to_18(path: &String, near_config: &NearConfig) {
                     if !apply_result.outcomes.is_empty() {
                         let (_, outcome_paths) =
                             ApplyTransactionResult::compute_outcomes_proof(&apply_result.outcomes);
+                        for outcome_with_id in apply_result.outcomes.iter() {
+                            println!("{:#?}", outcome_with_id);
+                        }
                         chain_store_update.save_outcomes_with_proofs(
                             &block.hash(),
                             shard_id,
